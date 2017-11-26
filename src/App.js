@@ -1,18 +1,96 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import MovieList from './MovieList';
+import {
+  Button,
+  Container,
+  Divider,
+  Grid,
+  Header,
+  Icon,
+  Image,
+  List,
+  Menu,
+  Segment,
+  Visibility,
+} from 'semantic-ui-react';
 
 class App extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      movies: [],
+      loading: true,
+      page: 1
+    }
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+  //https://api.themoviedb.org/3/movie/now_playing?api_key=4d88b953b70c08814373723637099542
+
+
+  async fetchMovie(page) {
+    const url = `https://api.themoviedb.org/3/movie/now_playing?api_key=4d88b953b70c08814373723637099542&page=${page}`
+    const results = await fetch(url)
+    const data = await results.json();
+    return data.results;
+  }
+
+  async componentDidMount() {
+    this.movies = await this.fetchMovie(this.state.page)
+    this.setState({
+      movies: this.movies,
+      loading: false
+    })
+  }
+
+  async handleLoadMore() {
+    const page = this.state.page + 1
+    await this.fetchMovie(page).then((newMovies) => {
+      this.setState({
+        page,
+        movies: this.state.movies.concat(newMovies)
+      });
+    })
+  }
+
   render() {
+    const FixedMenu = () => (
+      <Menu fixed='top' size='large'>
+        <Container>
+          <Menu.Item as='a' active>Home</Menu.Item>
+          <Menu.Item as='a'>Work</Menu.Item>
+          <Menu.Item as='a'>Company</Menu.Item>
+          <Menu.Item as='a'>Careers</Menu.Item>
+          <Menu.Menu position='right'>
+            <Menu.Item className='item'>
+              <Button as='a'>Log in</Button>
+            </Menu.Item>
+            <Menu.Item>
+              <Button as='a' primary>Sign Up</Button>
+            </Menu.Item>
+          </Menu.Menu>
+        </Container>
+      </Menu>
+    )
+
+    let content;
+    if (this.state.loading) {
+      content = <h1> I am loading! </h1>
+    } else {
+      content = <MovieList handleLoadMoreClick={(e) => this.handleLoadMore(e)} movies={this.state.movies} />
+    }
+
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <FixedMenu />
+        <div className="ui cards" style={{ marginTop: 5 + 'em' }}>
+          {content}
+        </div>
       </div>
     );
   }

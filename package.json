@@ -4,10 +4,14 @@
   "private": true,
   "dependencies": {
     "bloomer": "^0.6.2",
+    "bulma": "^0.6.1",
     "eslint": "^4.11.0",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
-    "react-scripts": "1.0.17"
+    "react-scripts": "1.0.17",
+    "semantic-ui": "^2.2.13",
+    "semantic-ui-css": "^2.2.12",
+    "semantic-ui-react": "^0.76.0"
   },
   "scripts": {
     "start": "react-scripts start",
