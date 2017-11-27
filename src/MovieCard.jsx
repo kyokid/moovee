@@ -5,6 +5,25 @@ import { CardContent } from 'bloomer/lib/components/Card/CardContent';
 
 
 export default class MovieCard extends Component {
+    showMovie() {
+        const movie = this.state.movie
+        console.warn(movie.title)
+    }
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            movie: null
+        }
+    }
+
+    componentDidMount() {
+        this.setState({
+            movie: this.props.movie
+        })
+        console.warn(this.props.movie)
+    }
+
     render() {
         const { movie } = this.props;
         const imagePrefix = "https://image.tmdb.org/t/p/w500";
@@ -26,7 +45,7 @@ export default class MovieCard extends Component {
           };
 
         return (
-            <Card>
+            <Card onClick={this.showMovie}>
                 <Image src={imagePrefix.concat(movie.poster_path)} />
                 <Card.Content>
                     <Card.Header>

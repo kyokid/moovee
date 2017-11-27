@@ -14,6 +14,8 @@ import {
   Menu,
   Segment,
   Visibility,
+  Dimmer,
+  Loader,
 } from 'semantic-ui-react';
 
 class App extends Component {
@@ -23,29 +25,38 @@ class App extends Component {
     this.state = {
       movies: [],
       loading: true,
-      page: 1
+      page: 1,
+      errorMessage: '',
     }
   }
 
-  sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
   //https://api.themoviedb.org/3/movie/now_playing?api_key=4d88b953b70c08814373723637099542
 
 
   async fetchMovie(page) {
-    const url = `https://api.themoviedb.org/3/movie/now_playing?api_key=4d88b953b70c08814373723637099542&page=${page}`
-    const results = await fetch(url)
+    const url = `https://api.themoviedb.org/3/movie/now_playing?api_key=4d88b953b70c08814373723637099542&page=${page}`;
+    const results = await fetch(url);
+    this.setState({
+      loading: true,
+    })
+    // const results = await fetch(url)
     const data = await results.json();
     return data.results;
   }
 
   async componentDidMount() {
-    this.movies = await this.fetchMovie(this.state.page)
-    this.setState({
-      movies: this.movies,
-      loading: false
-    })
+    await this.fetchMovie(this.state.page).then((res) => {
+      // if bi loi {
+      //   this.setState({
+      //     errorMessage: res.loi 
+      //   })
+      // }
+
+      this.setState({
+        movies: res,
+        loading: false
+      })
+    });
   }
 
   async handleLoadMore() {
@@ -56,6 +67,20 @@ class App extends Component {
         movies: this.state.movies.concat(newMovies)
       });
     })
+  }
+
+  renderExampleIndeterminate() {
+    return (
+      <div>
+        <Segment>
+          <Dimmer active>
+            <Loader indeterminate>Preparing Files</Loader>
+          </Dimmer>
+    
+          <Image src='/assets/images/wireframe/short-paragraph.png' />
+        </Segment>
+      </div>
+    )
   }
 
   render() {
@@ -78,18 +103,12 @@ class App extends Component {
       </Menu>
     )
 
-    let content;
-    if (this.state.loading) {
-      content = <h1> I am loading! </h1>
-    } else {
-      content = <MovieList handleLoadMoreClick={(e) => this.handleLoadMore(e)} movies={this.state.movies} />
-    }
-
     return (
       <div className="App">
         <FixedMenu />
+        { this.state.errorMessage ? this.state.errorMessage : ''}
         <div className="ui cards" style={{ marginTop: 5 + 'em' }}>
-          {content}
+          {this.state.loading ? this.renderExampleIndeterminate() : <MovieList handleLoadMoreClick={(e) => this.handleLoadMore(e)} movies={this.state.movies} />}
         </div>
       </div>
     );
