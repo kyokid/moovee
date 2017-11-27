@@ -5,9 +5,9 @@ import { CardContent } from 'bloomer/lib/components/Card/CardContent';
 
 
 export default class MovieCard extends Component {
-    showMovie() {
-        const movie = this.state.movie
-        console.warn(movie.title)
+    showMovie = () => {
+        const movie = this.props.movie
+        alert(movie.title)
     }
 
     constructor(props) {
@@ -21,14 +21,12 @@ export default class MovieCard extends Component {
         this.setState({
             movie: this.props.movie
         })
-        console.warn(this.props.movie)
     }
 
     render() {
         const { movie } = this.props;
         const imagePrefix = "https://image.tmdb.org/t/p/w500";
         var dateFormat = require('dateformat');
-
 
         var text_truncate = function(str, length, ending) {
             if (length == null) {

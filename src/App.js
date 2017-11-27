@@ -32,6 +32,9 @@ class App extends Component {
 
   //https://api.themoviedb.org/3/movie/now_playing?api_key=4d88b953b70c08814373723637099542
 
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
 
   async fetchMovie(page) {
     const url = `https://api.themoviedb.org/3/movie/now_playing?api_key=4d88b953b70c08814373723637099542&page=${page}`;
@@ -39,8 +42,8 @@ class App extends Component {
     this.setState({
       loading: true,
     })
-    // const results = await fetch(url)
     const data = await results.json();
+    await this.sleep(3000);
     return data.results;
   }
 
@@ -73,17 +76,20 @@ class App extends Component {
     return (
       <div>
         <Segment>
-          <Dimmer active>
-            <Loader indeterminate>Preparing Files</Loader>
-          </Dimmer>
-    
-          <Image src='/assets/images/wireframe/short-paragraph.png' />
+          <Loader className="center-loading" active inline='centered'>Preparing Files</Loader>
         </Segment>
       </div>
     )
   }
 
   render() {
+    let content;
+    if (this.state.loading) {
+      content = this.renderExampleIndeterminate()
+    } else {
+      content = <MovieList handleLoadMoreClick={(e) => this.handleLoadMore(e)} movies={this.state.movies} />
+    }
+
     const FixedMenu = () => (
       <Menu fixed='top' size='large'>
         <Container>
@@ -104,13 +110,13 @@ class App extends Component {
     )
 
     return (
-      <div className="App">
+      <Container>
         <FixedMenu />
-        { this.state.errorMessage ? this.state.errorMessage : ''}
-        <div className="ui cards" style={{ marginTop: 5 + 'em' }}>
-          {this.state.loading ? this.renderExampleIndeterminate() : <MovieList handleLoadMoreClick={(e) => this.handleLoadMore(e)} movies={this.state.movies} />}
-        </div>
-      </div>
+        {this.state.errorMessage ? this.state.errorMessage : ''}
+        <Container className="ui cards" style={{ marginTop: 5 + 'em' }}>
+          {content}
+        </Container>
+      </Container>
     );
   }
 }
