@@ -7,7 +7,7 @@ class MovieList extends Component {
         const { movies, handleLoadMoreClick } = this.props;
         if (!movies) return null;
         return (
-            <div className="ui cards">
+            <div className="ui cards four columns stackable">
                 { movies.map(movie => <MovieCard movie={movie} />) }
                 <Button fluid primary onClick={(e) => handleLoadMoreClick(e)}> Load more </Button>
             </div>

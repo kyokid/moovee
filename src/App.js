@@ -16,7 +16,11 @@ import {
   Visibility,
   Dimmer,
   Loader,
+  Search,
 } from 'semantic-ui-react';
+
+const api_key = '4d88b953b70c08814373723637099542'
+const defaultUrl = `https://api.themoviedb.org/3`
 
 class App extends Component {
 
@@ -27,6 +31,8 @@ class App extends Component {
       loading: true,
       page: 1,
       errorMessage: '',
+      isSearching: false,
+      keyword: ''
     }
   }
 
@@ -36,14 +42,26 @@ class App extends Component {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
+
   async fetchMovie(page) {
-    const url = `https://api.themoviedb.org/3/movie/now_playing?api_key=4d88b953b70c08814373723637099542&page=${page}`;
+    const url = `${defaultUrl}/movie/now_playing?api_key=${api_key}&page=${page}&include_adult=false`;
     const results = await fetch(url);
     this.setState({
       loading: true,
     })
     const data = await results.json();
-    await this.sleep(3000);
+    // await this.sleep(3000);
+    return data.results;
+  }
+
+  async searchMovie(page) {
+    const url = `${defaultUrl}/search/movie?api_key=${api_key}&query=${this.state.keyword}&page=${page}&include_adult=false`;
+    const results = await fetch(url);
+    this.setState({
+      isSearching: true,
+    })
+    const data = await results.json();
+    // await this.sleep(3000);
     return data.results;
   }
 
@@ -75,11 +93,35 @@ class App extends Component {
   renderExampleIndeterminate() {
     return (
       <div>
-        <Segment>
-          <Loader className="center-loading" active inline='centered'>Preparing Files</Loader>
-        </Segment>
+        <Loader className="center-loading" active inline='centered'>mooving...</Loader>
       </div>
     )
+  }
+
+  handleSearchChange = (e, { value }) => {
+    setTimeout(() => {
+    this.setState({ isSearching: true, keyword: value }, () => {
+      this.searchMovie(1).then(movies => {
+        this.setState({
+          movies,
+          isSearching: false
+        })
+      })
+    })
+  }, 500)
+    
+
+    // setTimeout(() => {
+    //   if (this.state.value.length < 1) return this.resetComponent()
+
+    //   const re = new RegExp(_.escapeRegExp(this.state.value), 'i')
+    //   const isMatch = result => re.test(result.title)
+
+    //   this.setState({
+    //     isLoading: false,
+    //     results: _.filter(source, isMatch),
+    //   })
+    // }, 500)
   }
 
   render() {
@@ -93,32 +135,44 @@ class App extends Component {
     const FixedMenu = () => (
       <Menu fixed='top' size='large'>
         <Container>
-          <Menu.Item as='a' active>Home</Menu.Item>
-          <Menu.Item as='a'>Work</Menu.Item>
-          <Menu.Item as='a'>Company</Menu.Item>
-          <Menu.Item as='a'>Careers</Menu.Item>
-          <Menu.Menu position='right'>
-            <Menu.Item className='item'>
-              <Button as='a'>Log in</Button>
-            </Menu.Item>
-            <Menu.Item>
-              <Button as='a' primary>Sign Up</Button>
-            </Menu.Item>
-          </Menu.Menu>
+          <Menu.Item as='' active>Home</Menu.Item>
+          <Menu.Item as=''>Playing now</Menu.Item>
+          <Menu.Item as=''>Top rated</Menu.Item>
+          <Menu.Item position='right'>
+            <Search loading={this.state.isSearching}
+              onSearchChange={this.handleSearchChange.bind(this)}
+              value={this.state.keyword}
+            />
+          </Menu.Item>
         </Container>
+
       </Menu>
     )
 
     return (
       <Container>
         <FixedMenu />
+
+        <Search
+        /*{ loading={isLoading}
+        onResultSelect={this.handleResultSelect}
+        onSearchChange={this.handleSearchChange}
+        results={results}
+        value={value}
+        {...this.props}} */
+        />
         {this.state.errorMessage ? this.state.errorMessage : ''}
-        <Container className="ui cards" style={{ marginTop: 5 + 'em' }}>
+        <Container style={{ marginTop: 5 + 'em' }}>
           {content}
         </Container>
+
+
+
       </Container>
     );
   }
+
+
 }
 
 export default App;
