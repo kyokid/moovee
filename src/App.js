@@ -67,14 +67,14 @@ class App extends Component {
 
   async componentDidMount() {
     await this.fetchMovie(this.state.page).then((res) => {
-      // if bi loi {
-      //   this.setState({
-      //     errorMessage: res.loi 
-      //   })
-      // }
-
+    
       this.setState({
         movies: res,
+        loading: false
+      })
+    }).catch(error => {
+      this.setState({
+        errorMessage: 'no internet connection',
         loading: false
       })
     });
@@ -85,8 +85,18 @@ class App extends Component {
     await this.fetchMovie(page).then((newMovies) => {
       this.setState({
         page,
-        movies: this.state.movies.concat(newMovies)
+        movies: this.state.movies.concat(newMovies),
+        loading: false
       });
+    })
+  }
+
+  async refreshListMovie() {
+    await this.fetchMovie(1).then((movies) => {
+      this.setState({
+        movies,
+        loading: false
+      })
     })
   }
 
@@ -143,6 +153,7 @@ class App extends Component {
               onSearchChange={this.handleSearchChange.bind(this)}
               value={this.state.keyword}
             />
+            <Button onClick={this.refreshListMovie.bind(this)}>Refresh</Button>
           </Menu.Item>
         </Container>
 
@@ -152,16 +163,7 @@ class App extends Component {
     return (
       <Container>
         <FixedMenu />
-
-        <Search
-        /*{ loading={isLoading}
-        onResultSelect={this.handleResultSelect}
-        onSearchChange={this.handleSearchChange}
-        results={results}
-        value={value}
-        {...this.props}} */
-        />
-        {this.state.errorMessage ? this.state.errorMessage : ''}
+        {this.state.errorMessage ? alert(this.state.errorMessage) : ''}
         <Container style={{ marginTop: 5 + 'em' }}>
           {content}
         </Container>

@@ -72,21 +72,13 @@ export default class MovieCard extends Component {
                     </Card.Description>
                 </Card.Content>
                 <Modal dimmer='blurring' open={this.state.open} onClose={this.handleClosePopup.bind(this)}>
-                    <Modal.Header>{movie.title}</Modal.Header>
                     <Modal.Content image>
-                        <Image wrapped size='medium' src={imagePrefix.concat(movie.poster_path)} />
+                        <Image size='large' src={imagePrefix.concat(movie.poster_path)} />
                         <Modal.Description>
-                            <Header>Default Profile Image</Header>
-                            <p>We've found the following gravatar image associated with your e-mail address.</p>
-                            <p>Is it okay to use this photo?</p>
+                            <Header>{movie.title}</Header>
+                            Overview: <p>{movie.overview}</p>
                         </Modal.Description>
                     </Modal.Content>
-                    <Modal.Actions>
-                        <Button color='black' onClick={this.close}>
-                            Nope
-                        </Button>
-                        <Button positive icon='checkmark' labelPosition='right' content="Yep, that's me" onClick={this.close} />
-                    </Modal.Actions>
                 </Modal>
             </Card>
         )
